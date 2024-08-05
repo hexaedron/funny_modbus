@@ -1,4 +1,5 @@
 #include "ch32v003fun.h"
+#include "funny_defs.h"
 
 #include <stdbool.h>
 #include <stdlib.h> 
