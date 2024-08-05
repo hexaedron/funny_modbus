@@ -1,0 +1,6 @@
+[submodule "ch32v003fun"]
+	path = ch32v003fun
+	url = https://github.com/cnlohr/ch32v003fun
+[submodule "freemodbus"]
+	path = freemodbus
+	url = https://github.com/cwalter-at/freemodbus
