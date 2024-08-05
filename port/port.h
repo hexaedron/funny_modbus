@@ -24,13 +24,17 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <ch32v003fun.h>
+
+void __critical_enter(void);
+void __critical_exit(void);
 
 #define	INLINE                      inline
 #define PR_BEGIN_EXTERN_C           extern "C" {
 #define	PR_END_EXTERN_C             }
 
-#define ENTER_CRITICAL_SECTION( )   
-#define EXIT_CRITICAL_SECTION( )    
+#define ENTER_CRITICAL_SECTION( )   ( __critical_enter( ) )
+#define EXIT_CRITICAL_SECTION( )    ( __critical_exit( ) ) 
 
 typedef uint8_t BOOL;
 
