@@ -25,6 +25,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <ch32v003fun.h>
+#include "funny_defs.h"
 
 void __critical_enter(void);
 void __critical_exit(void);

@@ -18,7 +18,7 @@
  *
  * File: $Id$
  */
-
+#include "stdbool.h"
 /* ----------------------- Platform includes --------------------------------*/
 #include "port.h"
 
@@ -30,9 +30,30 @@
 static void prvvTIMERExpiredISR( void );
 
 /* ----------------------- Start implementation -----------------------------*/
+uint16_t timeout = 0;
+
 BOOL
 xMBPortTimersInit( USHORT usTim1Timerout50us )
 {
+    timeout = (usTim1Timerout50us == 0) ? 1 : usTim1Timerout50us;
+
+    // Enable TIM2
+	RCC->APB1PCENR |= RCC_APB1Periph_TIM2;
+    // Reset TIM2 to init all regs
+	RCC->APB1PRSTR |= RCC_APB1Periph_TIM2;
+	RCC->APB1PRSTR &= ~RCC_APB1Periph_TIM2;
+
+    // We need a prescaler here so we can count up to seconds
+    TIM2->PSC = (FUNCONF_SYSTEM_CORE_CLOCK / 1000 / 20) - 1;
+
+    TIM2->CTLR1 |= TIM_ARPE | TIM_CounterMode_Down;
+
+
+    // Reload immediately
+    TIM2->SWEVGR |= TIM_PSCReloadMode_Immediate;
+
+    NVIC_EnableIRQ(TIM2_IRQn);
+
     return FALSE;
 }
 
@@ -41,12 +62,22 @@ inline void
 vMBPortTimersEnable(  )
 {
     /* Enable the timer with the timeout passed to xMBPortTimersInit( ) */
+
+    TIM2->ATRLR =  timeout - 1;
+    
+
+    // Enable TIM2
+	TIM2->CTLR1 |= TIM_CEN;
+    TIM2->DMAINTENR |= TIM_UIE;
 }
 
 inline void
 vMBPortTimersDisable(  )
 {
     /* Disable any pending timers. */
+
+    // Disable TIM2
+	TIM2->CTLR1 &= ~TIM_CEN;
 }
 
 /* Create an ISR which is called whenever the timer has expired. This function
@@ -58,3 +89,13 @@ static void prvvTIMERExpiredISR( void )
     ( void )pxMBPortCBTimerExpired(  );
 }
 
+
+
+    
+void TIM2_IRQHandler(void) INTERRUPT_HANDLER;
+void TIM2_IRQHandler(void)
+{
+    prvvTIMERExpiredISR(); 
+    TIM2->INTFR = ~TIM_FLAG_Update;
+
+}

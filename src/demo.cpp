@@ -29,6 +29,9 @@ int main()
 		__set_INTSYSCR(0x3); // [Experimental] enable fast interrupt feature	
 	#endif
 	//system_initSystick();
+
+    funGpioInitAll();
+	funPinMode(PD0, GPIO_Speed_10MHz | GPIO_CNF_OUT_PP);
 	
 	
 	const UCHAR     ucSlaveID[] = { 0xAA, 0xBB, 0xCC };
