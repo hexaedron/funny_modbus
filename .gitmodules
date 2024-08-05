@@ -4,3 +4,9 @@
 [submodule "freemodbus"]
 	path = freemodbus
 	url = https://github.com/cwalter-at/freemodbus
+[submodule "port/funny_libs"]
+	path = port/funny_libs
+	url = https://github.com/hexaedron/funny_libs/
+[submodule "funny_libs"]
+	path = funny_libs
+	url = https://github.com/hexaedron/funny_libs/
