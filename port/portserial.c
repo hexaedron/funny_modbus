@@ -24,6 +24,7 @@
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mb.h"
 #include "mbport.h"
+#include "mbconfig.h"
 
 /* ----------------------- static functions ---------------------------------*/
 static void prvvUARTTxReadyISR( void );
@@ -36,12 +37,74 @@ vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable )
     /* If xRXEnable enable serial receive interrupts. If xTxENable enable
      * transmitter empty interrupts.
      */
+    USART1->CTLR1 &= ~(USART_FLAG_RXNE | USART_FLAG_TXE);
+
+    if(xRxEnable) 
+    {
+        USART1->CTLR1 |= USART_FLAG_RXNE;
+    }
+
+    if(xTxEnable) 
+    {
+        USART1->CTLR1 |= USART_FLAG_TXE;
+    }
 }
+
+
+#define APB_CLOCK FUNCONF_SYSTEM_CORE_CLOCK
+#define OVER8DIV 4
 
 BOOL
 xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity eParity )
 {
-    return FALSE;
+    // Hardware Serial Pins D5 / D6
+    RCC->APB2PCENR |= RCC_APB2Periph_GPIOD | RCC_APB2Periph_USART1; // Enable UART
+    GPIOD->CFGLR &= ~(0xf<<(4*5));
+    GPIOD->CFGLR |= (GPIO_Speed_10MHz | GPIO_CNF_OUT_PP_AF)<<(4*5);
+
+    GPIOD->CFGLR &= ~(0xf<<(4*6));
+    GPIOD->CFGLR |= (GPIO_CNF_IN_PUPD)<<(4*6);
+
+    uint16_t wordLength = (ucDataBits == 9) ? USART_WordLength_9b : USART_WordLength_8b;
+    uint16_t parity;
+
+    switch (eParity)
+    {
+        case MB_PAR_NONE:
+            parity =  USART_Parity_No;
+        break;
+
+        case MB_PAR_ODD:
+            parity =  USART_Parity_Odd;
+        break;
+
+        case MB_PAR_EVEN:
+            parity =  USART_Parity_Even;
+        break;
+    
+        default:
+            parity =  USART_Parity_No;
+        break;
+    }
+
+    USART1->CTLR1 = wordLength | parity | USART_Mode_Rx | USART_Mode_Tx;
+    USART1->CTLR2 = USART_StopBits_1;
+    USART1->CTLR3 = USART_HardwareFlowControl_None;
+
+    // Set Baudrate
+    uint32_t integerDivider = ((25 * APB_CLOCK)) / (OVER8DIV * ulBaudRate);
+    uint32_t fractionalDivider = integerDivider % 100;
+
+    USART1->BRR = ((integerDivider / 100) << 4) | (((fractionalDivider * (OVER8DIV * 2) + 50) / 100) & 7);
+
+    // Enable UART
+    USART1->CTLR1 |= CTLR1_UE_Set;
+
+    // Enable Interrupt
+    //USART1->CTLR1 |= USART_FLAG_RXNE | USART_FLAG_TXE;
+    NVIC_EnableIRQ(USART1_IRQn);
+
+    return TRUE;
 }
 
 BOOL
@@ -50,6 +113,7 @@ xMBPortSerialPutByte( CHAR ucByte )
     /* Put a byte in the UARTs transmit buffer. This function is called
      * by the protocol stack if pxMBFrameCBTransmitterEmpty( ) has been
      * called. */
+    USART1->DATAR = ucByte;
     return TRUE;
 }
 
@@ -59,6 +123,8 @@ xMBPortSerialGetByte( CHAR * pucByte )
     /* Return the byte in the UARTs receive buffer. This function is called
      * by the protocol stack after pxMBFrameCBByteReceived( ) has been called.
      */
+    while(!(USART1->STATR & USART_FLAG_RXNE));
+    *pucByte = USART1->DATAR & (uint16_t)0x01FF;
     return TRUE;
 }
 
@@ -81,4 +147,22 @@ static void prvvUARTTxReadyISR( void )
 static void prvvUARTRxISR( void )
 {
     pxMBFrameCBByteReceived(  );
+}
+
+void USART1_IRQHandler( void ) INTERRUPT_HANDLER;
+void USART1_IRQHandler(void) 
+{
+    if(USART1->STATR & USART_FLAG_RXNE) 
+    {
+        prvvUARTRxISR();
+        //USART1->STATR &= ~USART_FLAG_RXNE;
+        return;
+    }
+
+    if(USART1->STATR & USART_FLAG_TXE) 
+    {
+        prvvUARTTxReadyISR();
+        //USART1->STATR &= ~USART_FLAG_TXE;
+        return;
+    }
 }

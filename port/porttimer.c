@@ -52,6 +52,7 @@ xMBPortTimersInit( USHORT usTim1Timerout50us )
     // Reload immediately
     TIM2->SWEVGR |= TIM_PSCReloadMode_Immediate;
 
+    TIM2->DMAINTENR |= TIM_UIE;
     NVIC_EnableIRQ(TIM2_IRQn);
 
     return TRUE;
@@ -64,7 +65,7 @@ vMBPortTimersEnable(  )
     /* Enable the timer with the timeout passed to xMBPortTimersInit( ) */
 
     // Reload counter
-    TIM2->ATRLR =  timeout - 1;
+    TIM2->ATRLR = 220-1;//timeout*4 - 1;
     
 
     // Enable TIM2
@@ -79,6 +80,7 @@ vMBPortTimersDisable(  )
 
     // Disable TIM2
 	TIM2->CTLR1 &= ~TIM_CEN;
+    TIM2->DMAINTENR &= ~TIM_UIE;
 }
 
 /* Create an ISR which is called whenever the timer has expired. This function
