@@ -54,7 +54,7 @@ xMBPortTimersInit( USHORT usTim1Timerout50us )
 
     NVIC_EnableIRQ(TIM2_IRQn);
 
-    return FALSE;
+    return TRUE;
 }
 
 
