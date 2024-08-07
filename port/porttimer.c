@@ -44,15 +44,15 @@ xMBPortTimersInit( USHORT usTim1Timerout50us )
 	RCC->APB1PRSTR &= ~RCC_APB1Periph_TIM2;
 
     // We need a prescaler here so we can count up to seconds
-    TIM2->PSC = (FUNCONF_SYSTEM_CORE_CLOCK / 1000 / 20) - 1;
+    TIM2->PSC = (FUNCONF_SYSTEM_CORE_CLOCK / 1000 / 10) - 1;
 
-    TIM2->CTLR1 |= TIM_ARPE | TIM_CounterMode_Down;
+    TIM2->CTLR1 |= TIM_ARPE | TIM_CounterMode_Up;
 
 
     // Reload immediately
-    TIM2->SWEVGR |= TIM_PSCReloadMode_Immediate;
+    TIM2->SWEVGR |= TIM_PSCReloadMode_Update;
 
-    TIM2->DMAINTENR |= TIM_UIE;
+    //TIM2->DMAINTENR |= TIM_UIE;
     NVIC_EnableIRQ(TIM2_IRQn);
 
     return TRUE;
@@ -65,7 +65,7 @@ vMBPortTimersEnable(  )
     /* Enable the timer with the timeout passed to xMBPortTimersInit( ) */
 
     // Reload counter
-    TIM2->ATRLR = timeout*2 - 1;
+    TIM2->ATRLR = timeout;
     
 
     // Enable TIM2
@@ -100,5 +100,5 @@ void TIM2_IRQHandler(void)
 {
     prvvTIMERExpiredISR(); 
     TIM2->INTFR = ~TIM_FLAG_Update;
-    TIM2->SWEVGR &= TIM_UG;
+    //TIM2->SWEVGR &= TIM_UG;
 }

@@ -40,7 +40,7 @@ int main()
 	const UCHAR     ucSlaveID[] = { 0xAA, 0xBB, 0xCC };
     eMBErrorCode    eStatus;
 
-    eStatus = eMBInit( MB_RTU, 0x0A, 0, 9600, MB_PAR_NONE);
+    eStatus = eMBInit( MB_RTU, 0x0A, 0, 115200, MB_PAR_NONE);
 
     eStatus = eMBSetSlaveID( 0x34, TRUE, ucSlaveID, 3 );
 
