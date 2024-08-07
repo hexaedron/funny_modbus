@@ -25,7 +25,14 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <ch32v003fun.h>
-#include "funny_defs.h"
+
+#define WCH_FAST_INTERRUPT_ENABLED
+
+#ifdef WCH_FAST_INTERRUPT_ENABLED
+  #define INTERRUPT_HANDLER __attribute__((interrupt("WCH-Interrupt-fast")))
+#else
+  #define INTERRUPT_HANDLER __attribute__((interrupt)) 
+#endif
 
 void __critical_enter(void);
 void __critical_exit(void);

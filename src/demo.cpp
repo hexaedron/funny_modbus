@@ -1,9 +1,16 @@
 #include "ch32v003fun.h"
-#include "funny_defs.h"
 
 #include <stdbool.h>
 #include <stdlib.h> 
 #include <math.h>
+
+#define WCH_FAST_INTERRUPT_ENABLED
+
+#ifdef WCH_FAST_INTERRUPT_ENABLED
+  #define INTERRUPT_HANDLER __attribute__((interrupt("WCH-Interrupt-fast")))
+#else
+  #define INTERRUPT_HANDLER __attribute__((interrupt)) 
+#endif
 
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mb.h"
