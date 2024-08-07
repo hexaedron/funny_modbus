@@ -33,9 +33,12 @@ int main()
 	const UCHAR     ucSlaveID[] = { 0xAA, 0xBB, 0xCC };
     eMBErrorCode    eStatus;
 
-    eStatus = eMBInit( MB_RTU, 0x0A, 0, 9600, MB_PAR_EVEN );
+    eStatus = eMBInit( MB_RTU, 0x0A, 0, 9600, MB_PAR_NONE);
 
     eStatus = eMBSetSlaveID( 0x34, TRUE, ucSlaveID, 3 );
+
+    usRegInputBuf[1] = 0xDEAD;
+    usRegInputBuf[2] = 0xBEEF;
 
     /* Enable the Modbus Protocol Stack. */
     eStatus = eMBEnable(  );
@@ -60,7 +63,7 @@ eMBRegInputCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs )
     if( ( usAddress >= REG_INPUT_START )
         && ( usAddress + usNRegs <= REG_INPUT_START + REG_INPUT_NREGS ) )
     {
-        iRegIndex = ( int )( usAddress - usRegInputStart );
+        iRegIndex = ( int )( usAddress - usRegInputStart - 1);
         while( usNRegs > 0 )
         {
             *pucRegBuffer++ =

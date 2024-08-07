@@ -65,7 +65,7 @@ vMBPortTimersEnable(  )
     /* Enable the timer with the timeout passed to xMBPortTimersInit( ) */
 
     // Reload counter
-    TIM2->ATRLR = 220-1;//timeout*4 - 1;
+    TIM2->ATRLR = timeout*2 - 1;
     
 
     // Enable TIM2
@@ -100,4 +100,5 @@ void TIM2_IRQHandler(void)
 {
     prvvTIMERExpiredISR(); 
     TIM2->INTFR = ~TIM_FLAG_Update;
+    TIM2->SWEVGR &= TIM_UG;
 }
