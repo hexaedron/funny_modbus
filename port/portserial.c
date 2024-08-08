@@ -65,7 +65,7 @@ xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity e
     GPIOD->CFGLR &= ~(0xf<<(4*6));
     GPIOD->CFGLR |= (GPIO_CNF_IN_PUPD)<<(4*6);
 
-    uint16_t wordLength = (ucDataBits == 9) ? USART_WordLength_9b : USART_WordLength_8b;
+    uint16_t wordLength = (eParity == MB_PAR_NONE) ? USART_WordLength_8b : USART_WordLength_9b;
     uint16_t parity;
 
     switch (eParity)
