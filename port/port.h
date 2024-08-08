@@ -26,7 +26,9 @@
 #include <inttypes.h>
 #include <ch32v003fun.h>
 
-#define WCH_FAST_INTERRUPT_ENABLED
+#ifndef WCH_FAST_INTERRUPT_ENABLED
+ #define WCH_FAST_INTERRUPT_ENABLED
+#endif
 
 #ifdef WCH_FAST_INTERRUPT_ENABLED
   #define INTERRUPT_HANDLER __attribute__((interrupt("WCH-Interrupt-fast")))
