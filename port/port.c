@@ -7,6 +7,7 @@ void __critical_enter(void)
     __disable_irq();
     ++lock_nesting_count;
 }
+
 void __critical_exit(void)
 {
     /* Unlock interrupts only when we are exiting the outermost nested call. */

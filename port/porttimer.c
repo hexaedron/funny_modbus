@@ -52,7 +52,6 @@ xMBPortTimersInit( USHORT usTim1Timerout50us )
     // Reload immediately
     TIM2->SWEVGR |= TIM_PSCReloadMode_Update;
 
-    //TIM2->DMAINTENR |= TIM_UIE;
     NVIC_EnableIRQ(TIM2_IRQn);
 
     return TRUE;
@@ -92,13 +91,10 @@ static void prvvTIMERExpiredISR( void )
     ( void )pxMBPortCBTimerExpired(  );
 }
 
-
-
     
 void TIM2_IRQHandler(void) INTERRUPT_HANDLER;
 void TIM2_IRQHandler(void)
 {
     prvvTIMERExpiredISR(); 
     TIM2->INTFR = ~TIM_FLAG_Update;
-    //TIM2->SWEVGR &= TIM_UG;
 }

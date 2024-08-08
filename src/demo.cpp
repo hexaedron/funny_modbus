@@ -15,6 +15,8 @@
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mb.h"
 #include "mbport.h"
+#include "mbadd_func.h"
+
 
 // from system.cpp
 void system_initSystick();
@@ -41,6 +43,7 @@ int main()
     eMBErrorCode    eStatus;
 
     eStatus = eMBInit( MB_RTU, 0x0A, 0, 115200, MB_PAR_NONE);
+    xMBPortSerialSetStopBits(MB_STOP_2);
 
     eStatus = eMBSetSlaveID( 0x34, TRUE, ucSlaveID, 3 );
 

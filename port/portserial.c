@@ -101,7 +101,6 @@ xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity e
     USART1->CTLR1 |= CTLR1_UE_Set;
 
     // Enable Interrupt
-    //USART1->CTLR1 |= USART_FLAG_RXNE | USART_FLAG_TXE;
     NVIC_EnableIRQ(USART1_IRQn);
 
     return TRUE;
@@ -155,14 +154,12 @@ void USART1_IRQHandler(void)
     if(USART1->STATR & USART_FLAG_RXNE) 
     {
         prvvUARTRxISR();
-        //USART1->STATR &= ~USART_FLAG_RXNE;
         return;
     }
 
     if(USART1->STATR & USART_FLAG_TXE) 
     {
         prvvUARTTxReadyISR();
-        //USART1->STATR &= ~USART_FLAG_TXE;
         return;
     }
 }
