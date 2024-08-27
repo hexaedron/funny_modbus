@@ -60,7 +60,7 @@ xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity e
     // Hardware Serial Pins D5 / D6
     RCC->APB2PCENR |= RCC_APB2Periph_GPIOD | RCC_APB2Periph_USART1; // Enable UART
     GPIOD->CFGLR &= ~(0xf<<(4*5));
-    GPIOD->CFGLR |= (GPIO_Speed_10MHz | GPIO_CNF_OUT_PP_AF)<<(4*5);
+    GPIOD->CFGLR |= (GPIO_Speed_10MHz | GPIO_CNF_OUT_OD_AF)<<(4*5);
 
     GPIOD->CFGLR &= ~(0xf<<(4*6));
     GPIOD->CFGLR |= (GPIO_CNF_IN_PUPD)<<(4*6);
